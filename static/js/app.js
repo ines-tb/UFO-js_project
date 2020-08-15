@@ -24,27 +24,61 @@ function buildTable(data){
     });
 };
 
-function handleClick() {
-      // Grab the datetime value from the filter
+// Variable to hold inserted filters 
+var filters = [];
+
+// Extract inserted filters and call the filterTable function
+function updateSelectedFilters(){
 
     let date = d3.select("#datetime").property("value");
-    let filteredData = tableData;
+    let city = d3.select("#city").property("value");
+    let state = d3.select("#state").property("value");
+    let country = d3.select("#country").property("value");
+    let shape = d3.select("#shape").property("value");
 
-    // Check to see if a date was entered and filter the
-    // data using that date.
+    filters = [];
+
     if (date){
-        // Apply `filter` to the table data to only keep the
-        // rows where the `datetime` value matches the filter value
-        filteredData = filteredData.filter(row => row.datetime === date);
+        // Add filter and corresponding id to the filter list
+        filters.push({id:"datetime", value:date})
     }
-    // Rebuild the table using the filtered data
-    // @NOTE: If no date was entered, then filteredData will
-    // just be the original tableData.
-    buildTable(filteredData);
+    if (city){
+        // Add filter and corresponding id to the filter list
+        filters.push({id:"city", value:city})
+    }
+    if (state){
+        // Add filter and corresponding id to the filter list
+        filters.push({id:"state", value:state})
+    }
+    if (country){
+        // Add filter and corresponding id to the filter list
+        filters.push({id:"country", value:country})
+    }
+    if (shape){
+        // Add filter and corresponding id to the filter list
+        filters.push({id:"shape", value:shape})
+    }
 
-};
+       
+    filterTable();
+}
+
+// Apply filters to the table
+function filterTable(){
+    let filteredData = tableData;
+    // Loop through each stored filter and apply to the corresponding column
+    filters.forEach((filter) => 
+        filteredData = filteredData.filter(row => row[filter.id] === filter.value));
+    if (filteredData.length == 0){
+        d3.select("#note").text("/!\\ No data found. Try other filters");
+    }else{
+        d3.select("#note").text("");
+    }
+    buildTable(filteredData);
+}
 
 // Attach an event to listen for the form button
-d3.selectAll("#filter-btn").on("click", handleClick);
+d3.selectAll("#filter-btn").on("click", updateSelectedFilters);
+
 // Build the table when the page loads
 buildTable(tableData);
